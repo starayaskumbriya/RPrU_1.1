@@ -1,0 +1,105 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    
+    <form id="feedbackForm" action="feedback.php" method="post">
+        
+            <div class="textWrapper">
+                <textarea class="feedback" id="feedback" type="text" placeholder=""></textarea>
+                <div>
+                    <input id="submit" class="submit" type="submit" value="отправить">
+                </div>
+            </div>
+        
+    </form>
+
+
+
+
+
+
+
+    <script>
+
+        
+
+
+
+        let urlSearch = window.location.search.replace(/[?]/gi, '');
+        if(urlSearch.split("_")[0] === "questionsAndSuggestions") document.getElementById("feedback").placeholder = "пожалуйста, опишите ваш вопрос или предложение.";
+        if(urlSearch.split("_")[0] === "bugReport") document.getElementById("feedback").placeholder = "приносим извинения за возникшие неудобства, пожалуйста, опишите баг или возникшую у вас проблему.";
+
+        async function SendFeedback(element) {
+
+            let feedbackArr = [];
+            let feedback = document.getElementById("feedback").value;
+            let questionType = urlSearch.split("_")[0];
+            let testName = urlSearch.split("_")[1];
+            feedbackArr.push(testName, feedback, questionType);
+
+            element.preventDefault();
+            let feedbackToServer = new FormData(document.getElementById('feedbackForm'));
+            let feedbackJSON = JSON.stringify(feedbackArr);
+            feedbackToServer.append('feedbackJSON', feedbackJSON);
+
+            try {
+                const response = await fetch('feedback.php', {
+                    method: 'POST',
+                    body: feedbackToServer
+                });
+                let json = await response.json();
+                // console.log(json);
+            } 
+            catch (error) {
+                console.error('Ошибка:', error);
+            }
+        } 
+        feedbackForm.onsubmit = SendFeedback;
+
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+    <style>
+        
+* {
+    box-sizing: border-box;
+}
+
+
+.feedback {
+    min-width: 280px;
+    min-height: 140px;
+    max-width: 1200px;
+    max-height: 600px;
+    margin-bottom: 5px;
+}
+
+
+.submit {
+    width: 280px;
+    height: 60px;
+    margin-left: 50%;
+    transform: translate(-50%, 0%)
+}
+
+.textWrapper {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -80%);
+}
+
+    </style>
+</body>
+</html>
